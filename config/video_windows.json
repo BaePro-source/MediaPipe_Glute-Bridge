@@ -1,0 +1,20 @@
+{
+  "videos": {
+    "gb1": {
+      "windows": [
+        {
+          "name": "worst_phase",
+          "start_sec": 0.0,
+          "end_sec": 2.0,
+          "angle_names": ["worst_alpha", "worst_beta"]
+        },
+        {
+          "name": "best_phase",
+          "start_sec": 3.0,
+          "end_sec": 6.0,
+          "angle_names": ["best_alpha", "best_beta"]
+        }
+      ]
+    }
+  }
+}

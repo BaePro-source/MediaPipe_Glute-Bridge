@@ -1,0 +1,20 @@
+{
+  "angles": [
+    {
+      "name": "worst_alpha",
+      "points": ["L_FOOT", "L_ANKLE", "L_KNEE"]
+    },
+    {
+      "name": "worst_beta",
+      "points": ["L_KNEE", "L_HIP", "L_SHOULDER"]
+    },
+    {
+      "name": "best_alpha",
+      "points": ["L_FOOT", "L_ANKLE", "L_KNEE"]
+    },
+    {
+      "name": "best_beta",
+      "points": ["L_KNEE", "L_HIP", "L_SHOULDER"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+name: mediapipe-youtube
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - mediapipe==0.10.14
+      - opencv-python==4.10.0.84
+      - numpy==1.26.4
+      - pandas==2.2.3
+      - tqdm==4.67.1

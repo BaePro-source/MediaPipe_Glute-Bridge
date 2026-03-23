@@ -1,0 +1,20 @@
+{
+  "angles": [
+    {
+      "name": "left_hip_extension",
+      "points": ["LEFT_SHOULDER", "LEFT_HIP", "LEFT_KNEE"]
+    },
+    {
+      "name": "right_hip_extension",
+      "points": ["RIGHT_SHOULDER", "RIGHT_HIP", "RIGHT_KNEE"]
+    },
+    {
+      "name": "left_knee_angle",
+      "points": ["LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"]
+    },
+    {
+      "name": "right_knee_angle",
+      "points": ["RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"]
+    }
+  ]
+}
