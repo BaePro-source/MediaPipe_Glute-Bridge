@@ -10,6 +10,8 @@ import pandas as pd
 LANDMARK_ALIASES = {
     "L_FOOT": "LEFT_FOOT_INDEX",
     "R_FOOT": "RIGHT_FOOT_INDEX",
+    "L_HEEL": "LEFT_HEEL",
+    "R_HEEL": "RIGHT_HEEL",
     "L_ANKLE": "LEFT_ANKLE",
     "R_ANKLE": "RIGHT_ANKLE",
     "L_KNEE": "LEFT_KNEE",
