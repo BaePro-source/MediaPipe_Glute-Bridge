@@ -21,6 +21,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-dir", required=True, help="Directory containing sample subdirectories.")
     parser.add_argument("--output-dir", required=True, help="Directory to write CSV and JSON results.")
     parser.add_argument("--angle-config", required=True, help="JSON file describing angle definitions.")
+    parser.add_argument(
+        "--dataset-role",
+        default=None,
+        choices=["sample", "validation"],
+        help="Dataset role. If omitted, it is inferred from the input directory name.",
+    )
     parser.add_argument("--min-detection-confidence", type=float, default=0.5)
     parser.add_argument("--min-tracking-confidence", type=float, default=0.5)
     parser.add_argument("--model-complexity", type=int, default=1, choices=[0, 1, 2])
@@ -34,11 +40,22 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     input_dir = Path(args.input_dir)
-    output_dir = ensure_directory(args.output_dir)
+    dataset_role = args.dataset_role or input_dir.name
+    if dataset_role not in {"sample", "validation"}:
+        print(
+            "Dataset role could not be inferred. "
+            "Use --dataset-role sample or --dataset-role validation."
+        )
+        return 1
+
+    output_root_dir = ensure_directory(args.output_dir)
+    output_dir = ensure_directory(output_root_dir / dataset_role)
     angle_defs = load_angle_config(args.angle_config)
     sample_dirs = find_sample_directories(input_dir)
     flip_samples = {name.strip() for name in args.flip_samples.split(",") if name.strip()}
-    judgment_ranges = load_judgment_ranges(args.judgment_ranges) if args.judgment_ranges else None
+    judgment_ranges = None
+    if dataset_role == "validation" and args.judgment_ranges:
+        judgment_ranges = load_judgment_ranges(args.judgment_ranges)
 
     if not sample_dirs:
         print(f"No sample directories found in: {input_dir}")
@@ -132,6 +149,8 @@ def main() -> int:
         {
             "input_dir": str(input_dir),
             "output_dir": str(output_dir),
+            "output_root_dir": str(output_root_dir),
+            "dataset_role": dataset_role,
             "analysis_mode": "image_pair",
             "processed_sample_count": len(results),
             "skipped_sample_count": len(skipped_samples),

@@ -1,11 +1,17 @@
 __pycache__/
 .pytest_cache/
 .DS_Store
+*.pyc
 
+# Input datasets
+# data/input/sample/<sample_name>/...
+# data/input/validation/<sample_name>/...
 data/input/**
 !data/input/.gitkeep
 
+# Generated outputs
+# data/output/sample/<sample_name>/...
+# data/output/sample/aggregate/...
+# data/output/validation/<sample_name>/...
 data/output/**
 !data/output/.gitkeep
-
-*.pyc
