@@ -67,6 +67,48 @@ def main() -> int:
     )
     stats_df.to_csv(stats_csv_path, index=False)
 
+    judgment_rows = []
+    for posture_name, metric_name in [
+        ("worst", "worst_alpha"),
+        ("worst", "worst_beta"),
+        ("best", "best_alpha"),
+        ("best", "best_beta"),
+    ]:
+        angle_name = metric_name.split("_")[1]
+        mean_value = float(mean_row[metric_name])
+        std_value = float(std_row[metric_name])
+        judgment_rows.append(
+            {
+                "posture": posture_name,
+                "metric": metric_name,
+                "angle_name": angle_name,
+                "sample_count": int(combined_df.shape[0]),
+                "min_value": float(min_row[metric_name]),
+                "max_value": float(max_row[metric_name]),
+                "mean_value": mean_value,
+                "std_value": std_value,
+                "mean_minus_std": mean_value - std_value,
+                "mean_plus_std": mean_value + std_value,
+                "range_text": f"{float(min_row[metric_name]):.2f} < {metric_name} < {float(max_row[metric_name]):.2f}",
+            }
+        )
+
+    judgment_csv_path = aggregate_dir / "posture_judgment_ranges.csv"
+    judgment_df = pd.DataFrame(judgment_rows)
+    judgment_df.to_csv(judgment_csv_path, index=False)
+
+    judgment_json_path = aggregate_dir / "posture_judgment_ranges.json"
+    with judgment_json_path.open("w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "sample_count": int(combined_df.shape[0]),
+                "ranges": judgment_rows,
+            },
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+
     range_json_path = aggregate_dir / "angle_ranges.json"
     range_payload = {
         "sample_count": int(combined_df.shape[0]),
@@ -101,6 +143,8 @@ def main() -> int:
         "all_samples_csv": str(combined_csv_path),
         "mean_csv": str(mean_csv_path),
         "stats_csv": str(stats_csv_path),
+        "judgment_csv": str(judgment_csv_path),
+        "judgment_json": str(judgment_json_path),
     }
     with range_json_path.open("w", encoding="utf-8") as f:
         json.dump(range_payload, f, ensure_ascii=False, indent=2)
@@ -123,6 +167,8 @@ def main() -> int:
                 "mean_csv": str(mean_csv_path),
                 "stats_csv": str(stats_csv_path),
                 "ranges_json": str(range_json_path),
+                "judgment_csv": str(judgment_csv_path),
+                "judgment_json": str(judgment_json_path),
             },
             f,
             ensure_ascii=False,
@@ -134,6 +180,8 @@ def main() -> int:
     print(f"Mean CSV: {mean_csv_path}")
     print(f"Stats CSV: {stats_csv_path}")
     print(f"Ranges JSON: {range_json_path}")
+    print(f"Judgment CSV: {judgment_csv_path}")
+    print(f"Judgment JSON: {judgment_json_path}")
     print(f"Mean JSON: {summary_json_path}")
     return 0
 
