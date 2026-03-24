@@ -41,6 +41,7 @@ class ImageSampleAnalysisResult:
     angles_csv: str
     summary_json: str
     annotated_images: dict[str, str]
+    angles: dict[str, float | None]
 
 
 class PoseImageAnalyzer:
@@ -67,6 +68,8 @@ class PoseImageAnalyzer:
         landmark_rows: list[dict] = []
         annotated_images: dict[str, str] = {}
         phase_status: dict[str, dict] = {}
+        analysis_mode = "image_pair" if set(phase_image_paths.keys()) == {"worst", "best"} else "single_image"
+        phase_order = {phase_name: index for index, phase_name in enumerate(phase_image_paths.keys())}
 
         with mp.solutions.pose.Pose(
             static_image_mode=True,
@@ -76,7 +79,7 @@ class PoseImageAnalyzer:
             min_tracking_confidence=self.min_tracking_confidence,
         ) as pose:
             for phase_name, image_path in phase_image_paths.items():
-                frame_index = PHASE_ORDER[phase_name]
+                frame_index = phase_order[phase_name]
                 image = cv2.imread(str(image_path))
                 if image is None:
                     phase_status[phase_name] = {"status": "read_failed", "image_path": str(image_path)}
@@ -139,12 +142,12 @@ class PoseImageAnalyzer:
 
         angles_long_df = build_angle_dataframe(landmarks_df, angle_defs) if not landmarks_df.empty else pd.DataFrame()
         angles_csv_path = sample_output_dir / f"{sample_name}_angles.csv"
-        angle_summary = self._build_angle_summary(sample_name, angles_long_df)
+        angle_summary = self._build_angle_summary(sample_name, angles_long_df, analysis_mode=analysis_mode)
         pd.DataFrame([angle_summary["angles"]]).to_csv(angles_csv_path, index=False)
 
         summary_payload = {
             "sample_name": sample_name,
-            "analysis_mode": "image_pair",
+            "analysis_mode": analysis_mode,
             "flip_horizontal": flip_horizontal,
             "phase_status": phase_status,
             "landmarks_csv": str(landmarks_csv_path),
@@ -162,9 +165,13 @@ class PoseImageAnalyzer:
             angles_csv=str(angles_csv_path),
             summary_json=str(summary_json_path),
             annotated_images=annotated_images,
+            angles=angle_summary["angles"],
         )
 
-    def _build_angle_summary(self, sample_name: str, angles_long_df: pd.DataFrame) -> dict:
+    def _build_angle_summary(self, sample_name: str, angles_long_df: pd.DataFrame, analysis_mode: str) -> dict:
+        if analysis_mode == "single_image":
+            return self._build_single_image_angle_summary(sample_name, angles_long_df)
+
         result = {
             "sample_name": sample_name,
             "angles": {
@@ -191,6 +198,30 @@ class PoseImageAnalyzer:
             else:
                 result["angles"]["best_alpha"] = row.get("best_alpha")
                 result["angles"]["best_beta"] = row.get("best_beta")
+        return result
+
+    def _build_single_image_angle_summary(self, sample_name: str, angles_long_df: pd.DataFrame) -> dict:
+        result = {
+            "sample_name": sample_name,
+            "angles": {
+                "alpha": None,
+                "beta": None,
+            },
+        }
+        if angles_long_df.empty:
+            return result
+
+        row = angles_long_df.iloc[0].to_dict()
+        alpha_value = None
+        beta_value = None
+        for key, value in row.items():
+            if key.endswith("alpha") and alpha_value is None:
+                alpha_value = value
+            if key.endswith("beta") and beta_value is None:
+                beta_value = value
+
+        result["angles"]["alpha"] = alpha_value
+        result["angles"]["beta"] = beta_value
         return result
 
     def _draw_landmark_labels(self, frame, landmarks, width: int, height: int) -> None:

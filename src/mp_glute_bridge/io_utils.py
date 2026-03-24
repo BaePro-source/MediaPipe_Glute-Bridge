@@ -36,6 +36,14 @@ def find_phase_image(sample_dir: str | Path, phase_name: str) -> Path | None:
     return None
 
 
+def find_image_files(sample_dir: str | Path) -> list[Path]:
+    directory = Path(sample_dir)
+    return sorted(
+        path for path in directory.iterdir()
+        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
+    )
+
+
 def has_existing_output(output_dir: str | Path, video_stem: str) -> bool:
     video_output_dir = Path(output_dir) / video_stem
     summary_path = video_output_dir / f"{video_stem}_summary.json"

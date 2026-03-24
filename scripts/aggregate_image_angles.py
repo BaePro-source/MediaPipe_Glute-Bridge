@@ -11,15 +11,23 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Aggregate image angle CSV files across samples.")
     parser.add_argument("--output-dir", required=True, help="Root directory containing sample output folders.")
     parser.add_argument("--pattern", default="*_angles.csv", help="Glob pattern for per-sample angle CSV files.")
+    parser.add_argument(
+        "--exclude-samples",
+        default="",
+        help="Comma-separated sample folder names to exclude from aggregation (for example: gb16,gb17).",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     output_dir = Path(args.output_dir)
+    exclude_samples = {
+        sample.strip() for sample in args.exclude_samples.split(",") if sample.strip()
+    }
     csv_paths = sorted(
         path for path in output_dir.glob(f"*/{args.pattern}")
-        if path.parent.name != "aggregate"
+        if path.parent.name != "aggregate" and path.parent.name not in exclude_samples
     )
 
     if not csv_paths:
@@ -175,6 +183,8 @@ def main() -> int:
             indent=2,
         )
 
+    if exclude_samples:
+        print(f"Excluded sample(s): {', '.join(sorted(exclude_samples))}")
     print(f"Aggregated {combined_df.shape[0]} sample(s).")
     print(f"Combined CSV: {combined_csv_path}")
     print(f"Mean CSV: {mean_csv_path}")

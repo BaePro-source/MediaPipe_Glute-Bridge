@@ -79,6 +79,17 @@ python scripts/run_image_batch.py \
   --flip-samples gb2
 ```
 
+판정 기준표로 자동 분류까지 함께 실행:
+
+```bash
+python scripts/run_image_batch.py \
+  --input-dir data/input \
+  --output-dir data/output \
+  --angle-config config/glute_bridge_angles.json \
+  --judgment-ranges data/output/aggregate/posture_judgment_ranges.json \
+  --judgment-method min_max
+```
+
 ## 출력 결과
 
 샘플마다 `data/output/<sample_name>/` 폴더가 생성되고, 해당 폴더 안에 아래 파일이 저장됩니다.
@@ -96,6 +107,7 @@ data/output/gb1/gb1_worst_skeleton.jpg
 - `*_landmarks.csv`: best/worst 두 사진의 랜드마크 좌표
 - `*_angles.csv`: 샘플 최종 4개 각도
 - `*_summary.json`: 처리 요약과 최종 각도
+- `*_classification.json`: 판정 기준표와 비교한 자동 분류 결과
 - `*_best_skeleton.jpg`, `*_worst_skeleton.jpg`: skeleton과 주요 landmark 라벨이 그려진 확인용 사진
 
 ## angle config 예시
