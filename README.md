@@ -150,3 +150,7 @@ python scripts/run_image_batch.py \
 
 이 리포지토리는 이미지 기반 운동 자세 분석 파이프라인의 핵심을 담고 있으며, 현재 `glute bridge` 분석에 특화되어 있습니다. 이후 `FastAPI` 서버 확장 및 추가 운동(스쿼트 등) 등록이 쉽도록 설계되었습니다.
 
+## 👤 Author
+
+**Bae Jaehoon**  
+Computer Vision Project
